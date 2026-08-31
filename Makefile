@@ -2,12 +2,12 @@ install:
 	npm ci
 
 develop:
-	mpm run dev
+	npm run dev
 
 lint:
 	npx eslint
 
-buid:
+build:
 	NODE_ENV=production npm run build
 
 test:
