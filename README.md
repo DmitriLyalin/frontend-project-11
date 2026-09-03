@@ -1,5 +1,7 @@
 # RSS агрегатор
 
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=DmitriLyalin_frontend-project-11&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DmitriLyalin_frontend-project-11)
+
 [![hexlet-check](https://github.com/DmitriLyalin/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/DmitriLyalin/frontend-project-11/actions)
 
 После проекта вы сможете уверенно работать с DOM, Vite, Tailwind CSS, AJAX, валидациями и деплоить проект
