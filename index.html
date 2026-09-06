@@ -1,17 +1,35 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RSS app</title>
-  </head>
-  <body>
-    <form action="submit">
-      <input type="text">
-      <button type="button">add</button>
-    </form>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSS app</title>
+</head>
+
+<body>
+  <section class="bg-sky-950" flex>
+    <div class ="mx-auto max-w-4xl" >
+      <h1 class = "text-white text-3xl font-bold">RSS app</h1>
+      <p class = "text-white text-lg">Начните читать RSS сегодня! Это легко, это красиво.</p>
+    </div>
+    <div>
+   <form action="submit">
+    <label for="url-input">Ссылка RSS</label>
+    <input type="text" 
+    class =" focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50 rounded px-4 py-2 " 
+    placeholder="Ссылка RSS" 
+    id="url-input" 
+    name="url-input">
+    <input class="bg-cyan-500 text-white px-4 py-2 rounded" type="submit" value="Добавить">
+  </form>
+    </div>
+ 
+  </section>
+  
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
