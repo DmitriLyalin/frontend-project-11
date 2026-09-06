@@ -26,7 +26,8 @@ const state = proxy({
     status: 'filling',
   },
   data : {
-    errors: [],
+    error: null,
+    successMsg: "RSS успешно добавлен",
     feed: [],
   }
 })
@@ -39,22 +40,26 @@ const validateUrl = (url) => {
     })
 }
 const inputUrl = document.getElementById('url-input')
-const submit = document.querySelector('button[type="submit"]')
+const submit = document.querySelector('input[type="submit"]')
 const form = document.querySelector('form')
 console.log(submit)
 
 form.addEventListener('submit', (e) => {
+   state.data.error = null
   e.preventDefault();
   const formData = new FormData(e.target)
   const url = formData.get('url-input')
   validateUrl(url).then((url) => {
+   
     state.data.feed.push({ url })
+     
   }).catch((err) => {
-    state.data.errors=[err]
+   
+    state.data.error = err
   })
+  
+
 })
-
-
 
 subscribe(state.data, () => {
   
@@ -63,5 +68,7 @@ subscribe(state.data, () => {
     console.log(watchedState)
     renderState(document.getElementById('app'), watchedState, inputUrl)
     console.log('feed', watchedState.feed)
-    console.log('errors', watchedState.errors)
+    console.log('errors', watchedState.error)
   })
+
+// renderState(document.getElementById('app'), state, inputUrl)
