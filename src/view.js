@@ -2,24 +2,32 @@
 
 
 const renderState = (container, state, inputUrl) => {
-  const { feed, errors } = state
-  container.innerHTML = ''
-  if (errors.length >0) {
+  inputUrl.classList.remove('border-red-500')
+  
+  const messageElement = document.createElement('div')
+  const { feed, error,successMsg } = state
+
+  if (error !== null) {
+
     inputUrl.classList.add('border-red-500')
-    const errorElement = document.createElement('div')
-    errorElement.textContent = errors.join(', ')
-    container.appendChild(errorElement)
+    messageElement.textContent = error
+    container.appendChild(messageElement)
   }
-  if (feed.length > 0) {
+
+  else {
+    container.innerHTML = ''
     inputUrl.focus()
+    inputUrl.value = ''
+    messageElement.textContent = successMsg
     const feedList = document.createElement('ul')
     feed.forEach((item) => {
       const listItem = document.createElement('li')
       listItem.textContent = item.url
       feedList.appendChild(listItem)
+      container.appendChild(messageElement)
     })
     container.appendChild(feedList)
   }
 
 }
-export {renderState}
+export { renderState }
