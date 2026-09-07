@@ -1,8 +1,9 @@
 import './style.css'
 import * as yup from 'yup';
+import i18next, { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
 import { renderState } from './view.js'
-
+import i18nextInstance from './i18next.js'
 const schema = yup.string()
   .trim()
   .required('emptyUrl')
@@ -27,7 +28,7 @@ const state = proxy({
   },
   data : {
     error: null,
-    successMsg: "RSS успешно добавлен",
+    successMsg: null,
     feed: [],
   }
 })
@@ -42,7 +43,7 @@ const validateUrl = (url) => {
 const inputUrl = document.getElementById('url-input')
 const submit = document.querySelector('input[type="submit"]')
 const form = document.querySelector('form')
-console.log(submit)
+
 
 form.addEventListener('submit', (e) => {
    state.data.error = null
@@ -55,7 +56,7 @@ form.addEventListener('submit', (e) => {
      
   }).catch((err) => {
    
-    state.data.error = err
+    state.data.error = keyFromSelector(($) => $.errors[err])
   })
   
 
@@ -72,3 +73,4 @@ subscribe(state.data, () => {
   })
 
 // renderState(document.getElementById('app'), state, inputUrl)
+export {state}

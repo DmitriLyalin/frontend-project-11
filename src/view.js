@@ -1,16 +1,16 @@
-
-
+import i18nextInstance from './i18next.js'
+import i18next from "i18next";
 
 const renderState = (container, state, inputUrl) => {
   inputUrl.classList.remove('border-red-500')
   
   const messageElement = document.createElement('div')
-  const { feed, error,successMsg } = state
+  const { feed, error } = state
 
   if (error !== null) {
 
     inputUrl.classList.add('border-red-500')
-    messageElement.textContent = error
+    messageElement.textContent = i18nextInstance.t(error) 
     container.appendChild(messageElement)
   }
 
@@ -18,7 +18,7 @@ const renderState = (container, state, inputUrl) => {
     container.innerHTML = ''
     inputUrl.focus()
     inputUrl.value = ''
-    messageElement.textContent = successMsg
+    messageElement.textContent = i18nextInstance.t (($) => $.valid)
     const feedList = document.createElement('ul')
     feed.forEach((item) => {
       const listItem = document.createElement('li')
