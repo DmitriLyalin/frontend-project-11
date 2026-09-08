@@ -4,24 +4,38 @@ import i18next, { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
 import { renderState } from './view.js'
 import i18nextInstance from './i18next.js'
+import axios from 'axios'
 const schema = yup.string()
   .trim()
   .required('emptyUrl')
   .url('invalidUrl')
-  .test('noDuplicate', 'duplicate found', (value) => {
+  .test('noDuplicate', 'duplicateRss', (value) => {
     const watchedState = snapshot(state.data)
-    console.log('watchedState', watchedState)
     const { feed } = watchedState
+    console.log(`value ${value}`)
     return !feed.some((item) => item.url === value)
   })
-  // .test('exists', 'urlNotFound', async (value) => {
-  //   if (!value) return false
-  //   return fetch(value, { method: 'HEAD' })
-  //     .then((response) => response.ok)
-  //     .catch(() => false)
-  // })
+//   .test('exists', 'invalidRss', async (value) => {
+//     if (!value) return false
+//     return axios.get('https://allorigins.hexlet.app/get', {
+//   params: { disableCache: true, url: value }
+// })
+//       .then((response) => {
+//         console.log(response.data.status)
+//         return response.data.status.http_code === 200})
+//       .catch(() => false)
+//   })
  
-
+const loadData = (url) => {
+  return axios.get('https://allorigins.hexlet.app/get', {
+    params: {disableCache: true, url}
+  }).then((response) => {
+    return response.data.contents
+  })
+  .catch((err) => {
+    err.message = 'networkError'
+    return Promise.reject(err)} )
+}
 const state = proxy({
   ui : {
     status: 'filling',
@@ -37,26 +51,39 @@ const validateUrl = (url) => {
     .validate(url)
     .then(() => url)
     .catch((err) => {
-      return Promise.reject(err.message)
+      return Promise.reject(err)
     })
 }
 const inputUrl = document.getElementById('url-input')
 const submit = document.querySelector('input[type="submit"]')
 const form = document.querySelector('form')
 
+const parseRss = (rss) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rss, "application/xml");
+  if (doc.querySelector('parsererror')) {
+    throw new Error('invalidRss')
+  }
+  else {
+    console.log('doc', doc)
+    return doc
+  }
 
+  
+}
 form.addEventListener('submit', (e) => {
    state.data.error = null
   e.preventDefault();
   const formData = new FormData(e.target)
   const url = formData.get('url-input')
-  validateUrl(url).then((url) => {
+  validateUrl(url)
+  .then(url =>loadData(url))
+  .then((rss) => {
+    parseRss(rss)
+  })
+  .catch((err) => {
    
-    state.data.feed.push({ url })
-     
-  }).catch((err) => {
-   
-    state.data.error = keyFromSelector(($) => $.errors[err])
+    state.data.error = keyFromSelector(($) => $.errors[err.message])
   })
   
 
