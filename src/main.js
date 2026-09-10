@@ -44,7 +44,7 @@ const state = proxy({
     status: 'filling',
   },
   data: {
-    error: null,
+    errors: [],
     successMsg: null,
     feed: [],
     posts: [],
@@ -88,7 +88,7 @@ const counter =createIdGenerator()
 console.log(counter)
 console.log(counter)
 form.addEventListener('submit', (e) => {
-  state.data.error = null
+  
   e.preventDefault(); 
   const formData = new FormData(e.target)
   const url = formData.get('url-input')
@@ -99,6 +99,7 @@ form.addEventListener('submit', (e) => {
       state.data.feed.push({id: data.id, title:data.channelTitle, description:data.channelDescription, url: url})
       data.links.forEach((link) => state.data.posts.push({title: link, id:counter(), feedId: data.id}))
       console.log(state.data)
+      state.data.error = null
     })
     .catch((err) => {
 
@@ -113,7 +114,7 @@ subscribe(state.data, () => {
   const watchedState = snapshot(state.data);
 
   console.log(watchedState)
-  renderState(document.getElementById('app'), watchedState, inputUrl)
+  renderState(document.getElementById('form-container'),document.getElementById('feed'),document.getElementById('posts'), watchedState, inputUrl)
   console.log('feed', watchedState.feed)
   console.log('posts', watchedState.posts)
   console.log('errors', watchedState.error)
