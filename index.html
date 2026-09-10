@@ -14,7 +14,7 @@
       <h1 class = "text-white text-3xl font-bold">RSS app</h1>
       <p class = "text-white text-lg">Начните читать RSS сегодня! Это легко, это красиво.</p>
     </div>
-    <div>
+    <div id="form-container">
    <form action="submit">
     <label for="url-input">Ссылка RSS</label>
     <input type="text" 
@@ -24,11 +24,15 @@
     name="url-input">
     <input class="bg-cyan-500 text-white px-4 py-2 rounded" type="submit" value="Добавить">
   </form>
+  <p class =" text-white">Пример https://lorem-rss.hexlet.app/feed</p>
     </div>
  
   </section>
   
-  <div id="app"></div>
+  <div id="app" class="grid grid-cols-3 justify-between ">
+    <article id="feed" class="order-1 " ></article>
+    <article id="posts" class="col-span-2"></article>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 
