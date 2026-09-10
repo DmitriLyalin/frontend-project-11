@@ -14,6 +14,7 @@ const i18nextInstance = i18n.createInstance();
       networkError: 'Ошибка сети',
     },
     valid: 'RSS успешно загружен',
+    view: 'Просмотр'
   },
     }
   }
