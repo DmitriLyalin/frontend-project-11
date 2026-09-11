@@ -21,7 +21,8 @@ const renderState = (formContainer, feedContainer,postsContainer, state, inputUr
     document.querySelector('#posts').classList.add('border', 'border-gray-300', 'p-4', 'mb-4')
      messageElement.classList.add('text-green-500')
     feedContainer.innerHTML = ''
-    // const postsContainer = document.createElement('div')
+    postsContainer.innerHTML = ''
+   
     inputUrl.focus()
     inputUrl.value = ''
     const feedList = document.createElement('ul')
@@ -34,7 +35,7 @@ const renderState = (formContainer, feedContainer,postsContainer, state, inputUr
       feedDescription.textContent = item.description
       listItem.append(feedTitle, feedDescription)
       feedList.appendChild(listItem)
-
+})
       const postList = document.createElement('ul')
       posts.forEach((post) => {
         const postItem = document.createElement('li')
@@ -50,8 +51,8 @@ const renderState = (formContainer, feedContainer,postsContainer, state, inputUr
         postList.appendChild(postItem)
         
       })
-      postsContainer.appendChild(postList)
-    })
+      postsContainer.append(postList)
+    
 
     feedContainer.append(feedList)
   }
