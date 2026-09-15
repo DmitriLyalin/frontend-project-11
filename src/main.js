@@ -26,8 +26,15 @@ const schema = yup.string()
 //         return response.data.status.http_code === 200})
 //       .catch(() => false)
 //   })
-
-
+let timerID = null
+const createIdGenerator = (start = 1) => {
+  let count = start;
+  return () => count++;
+};
+const feedCounter = createIdGenerator()
+const postCounter = createIdGenerator()
+// const feedId = feedCounter()
+//   const postId = postCounter()
 const loadData = (url) => {
   return axios.get('https://allorigins.hexlet.app/get', {
     params: { disableCache: true, url }
@@ -80,20 +87,15 @@ const parseRss = (rss) => {
   }
 
 }
-const createIdGenerator = (start = 1) => {
-  let count = start;
-  return () => count++;
-};
 
+ 
 const updateUi = (data, url) => {
-  const feedId = feedCounter()
-  const postId = postCounter()
-  state.data.feed.push({ id: feedId, title: data.channelTitle, description: data.channelDescription, url: url })
-  data.links.forEach((link) => state.data.posts.push({ id: postId, title: link, feedId: feedId }))
+ 
+  state.data.feed.push({ id: feedCounter(), title: data.channelTitle, description: data.channelDescription, url: url })
+  data.links.forEach((link) => state.data.posts.push({ id: postCounter(), title: link, feedId: state.data.feed[state.data.feed.length - 1].id }))
   state.data.error = null
 }
-const feedCounter = createIdGenerator()
-const postCounter = createIdGenerator()
+
 form.addEventListener('submit', (e) => {
 
   e.preventDefault();
@@ -103,7 +105,14 @@ form.addEventListener('submit', (e) => {
     .then(url => loadData(url))
     .then((rss) => parseRss(rss))
     .then((data) => updateUi(data, url))
-    .then(() => setTimeout(checkForNewPosts()), 5000)
+    .then(() => {
+       if(timerID === null) {
+    return checkForNewPosts()
+  }
+      else{
+        return
+      }
+    })
     .catch((err) => {
 
       state.data.error = keyFromSelector(($) => $.errors[err.message])
@@ -123,6 +132,7 @@ subscribe(state.data, () => {
   // console.log('errors', watchedState.error)
 })
 const checkForNewPosts = () => {
+ 
   const watchedState = snapshot(state.data)
   console.log('checkForNewPosts', watchedState)
   const promises = watchedState.feed.map((item) => {
@@ -148,16 +158,14 @@ const checkForNewPosts = () => {
     .then((parsed) => {
       console.log('parsed', parsed)
       parsed.forEach((data) => {
-        // const watchedState = snapshot(state.data)
         console.log('watchedState', watchedState)
         const existingFeed = watchedState.feed.find((item) => item.url === data.url)
         const newPosts = watchedState.posts.filter((item) => item.feedId === existingFeed.id)
         const newPostsTitles = new Set(newPosts.map(item => item.title));
         const result = data.data.links.filter(link => !newPostsTitles.has(link))
-        console.log(result)
-        console.log(existingFeed)
-         result.forEach((link) => state.data.posts.push({ id: 5, title: link, feedId: existingFeed.id }))
-         setTimeout(checkForNewPosts, 5000)
+        console.log('result', result)
+         result.forEach((link) => state.data.posts.push({ id: postCounter(), title: link, feedId: existingFeed.id }))
+         
       })
     })
     .catch((err) => {
@@ -165,7 +173,7 @@ const checkForNewPosts = () => {
       state.data.error = keyFromSelector(($) => $.errors[err.message])
     })
 
- 
+ timerID = setTimeout(checkForNewPosts, 5000)
 }
 
 export { state }
