@@ -9,28 +9,28 @@
 </head>
 
 <body>
-  <section class="bg-sky-950" flex>
-    <div class ="mx-auto max-w-4xl" >
-      <h1 class = "text-white text-3xl font-bold">RSS app</h1>
-      <p class = "text-white text-lg">Начните читать RSS сегодня! Это легко, это красиво.</p>
+  <section class=" bg-sky-950" flex >
+    <div class ="mx-auto max-w-2xl">
+      <div class=" text-white  mb-1 ">
+        <h1 class=" text-3xl max-md:text-xl font-bold">RSS агрегатор</h1>
+        <p class="text-lg max-md:text-sm">Начните читать RSS сегодня! Это легко, это красиво.</p>
+      </div>
+      <div class=" flex  flex-col" id="form-container">
+        <form   action="submit">
+           <label class="block text-white mb-1" for="url-input">Ссылка RSS</label>
+          <div class="flex flex-wrap justify-between gap-3">
+            <input  type="text" class="flex-1 appearance-none border-2  border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white rounded px-4 py-2 "
+              placeholder="Ссылка RSS" id="url-input" name="url-input" value="">
+            <input class= "self-center bg-cyan-500 text-white px-4 py-2 rounded hover:cursor-pointer hover:bg-cyan-700" type="submit" value="Добавить">
+          </div>
+        </form>
+        <p class=" text-white">Пример https://lorem-rss.hexlet.app/feed</p>
+      </div>
     </div>
-    <div id="form-container">
-   <form action="submit">
-    <label for="url-input">Ссылка RSS</label>
-    <input type="text" 
-    class ="  focus:ring focus:ring-cyan-500 focus:ring-opacity-50 rounded px-4 py-2 " 
-    placeholder="Ссылка RSS" 
-    id="url-input" 
-    name="url-input">
-    <input class="bg-cyan-500 text-white px-4 py-2 rounded" type="submit" value="Добавить">
-  </form>
-  <p class =" text-white">Пример https://lorem-rss.hexlet.app/feed</p>
-    </div>
- 
+
   </section>
-  
-  <div id="app" class="grid grid-cols-3 gap-4 mx-auto max-w-4xl mt-4">
-    <article id="feed" class="order-1" ></article>
+  <div id="app" class="grid grid-cols-3 gap-4 mx-auto max-w-4xl mt-4 px-4">
+    <article id="feed" class="order-1"></article>
     <article id="posts" class="col-span-2 "></article>
   </div>
   <script type="module" src="/src/main.js"></script>
