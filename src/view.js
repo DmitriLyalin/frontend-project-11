@@ -1,62 +1,135 @@
 import i18nextInstance from './i18next.js'
+import closeIconRaw from './assets/closeBtn.svg?raw'
+
+const renderPosts = (postsContainer, state) => {
+  postsContainer.innerHTML = ''
+  postsContainer.classList.add('border', 'border-gray-300', 'mb-4')
+  const postContainerTitle = document.createElement('h2')
+  postContainerTitle.textContent = i18nextInstance.t(($) => $.ui.postsSection)
+  postContainerTitle.classList.add('text-black', 'text-2xl', 'max-md:text-xl', 'font-bold', 'mb-2', 'px-2')
+  const postList = document.createElement('ul')
+  state.posts.forEach((post) => {
+
+    const postItem = document.createElement('li')
+    postItem.classList.add('flex', 'justify-between', 'border-b-1', 'border-gray-300', 'items-center')
+    const postLink = document.createElement('a')
+
+    const viewButton = document.createElement('button')
+    viewButton.classList.add('border', 'border-cyan-500', 'my-2', 'mx-4', 'px-2', 'py-1', 'rounded', 'text-cyan-500', 'cursor-pointer')
+    viewButton.textContent = i18nextInstance.t(($) => $.ui.buttons.view)
+    postLink.setAttribute('href', `${post.postUrl}`)
+    postLink.dataset.seen = 'false'
+    postLink.classList.add('font-bold', 'text-cyan-500', 'px-4')
+    if (post.isSeen) {
+      postLink.dataset.seen = 'true'
+      postLink.classList.add('text-gray-300')
+      postLink.classList.remove('font-bold')
+    }
+    postLink.textContent = post.title
+    postItem.append(postLink, viewButton)
+
+    postList.appendChild(postItem)
+   
+    
+  })
+  postsContainer.append(postContainerTitle,postList)
+}
+const renderFeed = (feedContainer, state) => {
+  feedContainer.innerHTML = ''
+  feedContainer.classList.add('border', 'border-gray-300', 'mb-4')
+ const feedContainerTitle = document.createElement('h2')
+  feedContainerTitle.textContent = i18nextInstance.t(($) => $.ui.feedSection)
+  feedContainerTitle.classList.add('text-black', 'text-2xl', 'max-md:text-xl', 'font-bold', 'mb-2', 'px-2')
+  const feedList = document.createElement('ul')
+  state.feed.forEach((item) => {
+    const listItem = document.createElement('li')
+    listItem.classList.add('border-b-1', 'border-gray-300', 'text-sm', 'mb-2','py-2')
+    const feedTitle = document.createElement('h3')
+    feedTitle.classList.add('text-black', 'font-bold', 'mb-1', 'px-2')
+    feedTitle.textContent = item.title
+    const feedDescription = document.createElement('p')
+    feedDescription.classList.add('px-2')
+    feedDescription.textContent = item.description
+    listItem.append(feedTitle, feedDescription)
+    feedList.appendChild(listItem)
+  })
 
 
-const renderState = (formContainer, feedContainer,postsContainer, state, inputUrl) => {
 
-  inputUrl.classList.remove('border-red-500')
-
+  feedContainer.append(feedContainerTitle, feedList)
+}
+const renderMessage = (messageContainer, state) => {
+  document.querySelector('input').classList.remove('ring-2', 'ring-red-500')
   const messageElement = document.createElement('div')
   messageElement.classList.add('text-sm', 'mt-2')
   messageElement.setAttribute('id', 'message')
-  const { feed, error, posts } = state
-  messageElement.textContent = error 
+  const { error } = state
+  messageElement.textContent = error
     ? i18nextInstance.t(error)
     : i18nextInstance.t(($) => $.valid);
   if (error) {
-    inputUrl.classList.add('border-red-500')
+    console.log(error)
     messageElement.classList.add('text-red-500')
+    document.querySelector('input').classList.add('ring-2', 'ring-red-500')
   }
 
-  else  {
-    document.querySelector('#posts').classList.add('border', 'border-gray-300', 'p-4', 'mb-4')
-     messageElement.classList.add('text-green-500')
-    feedContainer.innerHTML = ''
-    postsContainer.innerHTML = ''
-   
-    inputUrl.focus()
-    inputUrl.value = ''
-    const feedList = document.createElement('ul')
-    feed.forEach((item) => {
-      const listItem = document.createElement('li')
-      listItem.classList.add('border', 'border-gray-300', 'p-4', 'mb-4')
-      const feedTitle = document.createElement('h3')
-      feedTitle.textContent = item.title
-      const feedDescription = document.createElement('p')
-      feedDescription.textContent = item.description
-      listItem.append(feedTitle, feedDescription)
-      feedList.appendChild(listItem)
-})
-      const postList = document.createElement('ul')
-      posts.forEach((post) => {
-        const postItem = document.createElement('li')
-        postItem.classList.add('flex', 'justify-between', 'border-b-1')
-        const postLink = document.createElement('a')
-        const viewButton = document.createElement('button')
-
-        viewButton.textContent = i18nextInstance.t(($) => $.view)
-        postLink.setAttribute('href', `${post.title}`)
-        postLink.textContent = post.title
-        postItem.append(postLink, viewButton)
-        
-        postList.appendChild(postItem)
-        
-      })
-      postsContainer.append(postList)
+  else {
     
-
-    feedContainer.append(feedList)
+    messageElement.classList.add('text-green-500')
   }
-  formContainer.querySelector('#message')?.remove()
-  formContainer.append(messageElement)
+  messageContainer.querySelector('#message')?.remove()
+  messageContainer.append(messageElement)
 }
-export { renderState }
+
+
+const renderModal = (container, state) => {
+ container.querySelector('dialog')?.remove()
+console.log('renderModal', state)
+  const dialogWindow = document.createElement('dialog')
+  dialogWindow.classList.add('fixed', 'inset-0', 'm-auto',  'gap-2', 'border', 'py-4', 'border-black-500', 'rounded-lg')
+  dialogWindow.dataset.test = 'modal-body'
+
+  const dialogContent = document.createElement('div')
+  
+  const dialogHeader = document.createElement('div')
+  dialogHeader.classList.add('flex', 'justify-between', 'content-start', 'mb-2', 'pb-2', 'px-4')
+
+
+  const dialogTitle = document.createElement('h3')
+  dialogTitle.classList.add('font-bold', 'text-lg', 'mb-2')
+  const xButton = document.createElement('button')
+  xButton.classList.add(  'text-gray-500', 'cursor-pointer', 'font-semibold', 'text-lg', 'mb-2')
+  xButton.innerHTML = closeIconRaw
+  dialogHeader.append(dialogTitle, xButton)
+
+
+  const dialogCloseButton = document.createElement('button')
+  dialogCloseButton.classList.add('border', 'border-gray-300', 'px-2', 'py-1', 'rounded', 'text-gray-500', 'cursor-pointer')
+  const dialogDescription = document.createElement('p')
+  dialogDescription.classList.add('border-y', 'border-gray-700', 'py-4', 'px-4', 'mb-2')
+  const modalViewButton = document.createElement('button')
+   modalViewButton.classList.add('border', 'border-cyan-500', 'px-2', 'py-2', 'bg-blue-600', 'text-white', 'rounded', 'cursor-pointer')
+  modalViewButton.textContent = i18nextInstance.t(($) => $.ui.buttons.readMore)
+  const closeModalButton = document.createElement('button')
+  closeModalButton.classList.add('border', 'border-gray-300', 'px-4', 'py-2', 'rounded', 'bg-gray-500', 'text-white', 'cursor-pointer')
+  closeModalButton.textContent = i18nextInstance.t(($) => $.ui.buttons.close)
+ 
+  dialogTitle.textContent = state.ui.activePost.title
+  dialogDescription.textContent = i18nextInstance.t(($) => $.modalWindow.goal)
+  
+  // Buttons container
+  const buttonsContainer = document.createElement('div')
+  buttonsContainer.classList.add('flex', 'justify-end', 'gap-2', 'px-4')
+  buttonsContainer.append(  modalViewButton, closeModalButton)
+  closeModalButton.addEventListener('click', () => dialogWindow.close())
+  dialogContent.append(dialogHeader, dialogDescription, buttonsContainer)
+  dialogWindow.append(  dialogContent )
+  container.append(dialogWindow)
+   xButton.addEventListener('click', () => dialogWindow.close())
+    
+  dialogWindow.showModal()
+}
+
+
+
+export { renderMessage, renderPosts, renderFeed, renderModal }
