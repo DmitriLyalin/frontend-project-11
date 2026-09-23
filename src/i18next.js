@@ -13,8 +13,21 @@ const i18nextInstance = i18n.createInstance();
       duplicateRss: 'RSS уже существует',
       networkError: 'Ошибка сети',
     },
+    ui :{
+      formLabel: 'Ссылка RSS',
+      feedSection: 'Фиды',
+      postsSection: 'Посты',
+      buttons: {
+        view: 'Просмотр',
+        close: 'Закрыть',
+        readMore: 'Читать полностью',
+        add: 'Добавить'
+      }
+    },
     valid: 'RSS успешно загружен',
-    view: 'Просмотр'
+    modalWindow: {
+      goal: 'Цель: Научиться извлекать из дерева необходимые данные'
+    }
   },
     }
   }
