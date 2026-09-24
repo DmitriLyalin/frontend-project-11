@@ -4,7 +4,7 @@ import { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
 import { renderPosts, renderFeed, renderMessage, renderModal } from './view.js'
 import axios from 'axios'
-// validation schema
+// схема валидации URL
 const schema = yup.string()
   .trim()
   .required('emptyUrl')
@@ -14,14 +14,14 @@ const schema = yup.string()
     const { feed } = watchedState
     return !feed.some((item) => item.url === value)
   })
- // создание timerID
+// создание timerID
 let timerID = null
 // генерация уникального ID
 const createIdGenerator = (start = 1) => {
   let count = start;
   return () => count++;
 };
- // обработчик клика на Посты для выявления активного поста
+// обработчик клика на Посты для выявления активного поста
 const postContainer = document.getElementById('posts')
 postContainer.addEventListener('click', (e) => {
   state.ui.activePost = null
@@ -36,7 +36,7 @@ postContainer.addEventListener('click', (e) => {
 const feedCounter = createIdGenerator()
 const postCounter = createIdGenerator()
 
-//Загрузка данных с целевого url
+//Загрузка данных с сервера
 
 const loadData = (url) => {
   return axios.get('https://allorigins.hexlet.app/get', {
@@ -50,18 +50,22 @@ const loadData = (url) => {
     })
 }
 
-//состояние объекта
+//создание состояния приложения
 const state = proxy({
   ui: {
-    activePost:null,
+    formError: {
+      error:null
+    },
+    activePost: null,
   },
   data: {
-    error: null,
+    // error: null,
     successMsg: null,
     feed: [],
     posts: [],
   }
 })
+// функция валидации URL
 const validateUrl = (url) => {
   return schema
     .validate(url)
@@ -70,8 +74,8 @@ const validateUrl = (url) => {
       return Promise.reject(err)
     })
 }
-const form = document.querySelector('form')
 
+// функция парсинга RSS
 const parseRss = (rss) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(rss, "application/xml");
@@ -79,14 +83,16 @@ const parseRss = (rss) => {
     throw new Error('invalidRss')
   }
   else {
+    // получение данных из RSS
     const channelTitle = doc.querySelector('channel > title').textContent
     const channelDescription = doc.querySelector('channel > description').textContent
     const posts = doc.querySelectorAll('item')
     const links = [...posts].map((post) => {
+      // получение данных из каждого поста
       const postTitle = post.querySelector('title').textContent
       const postLink = post.querySelector('link').textContent
       const postDescription = post.querySelector('description').textContent
-      return {postTitle, postLink, postDescription}
+      return { postTitle, postLink, postDescription }
     })
 
     return { channelTitle, channelDescription, links }
@@ -94,16 +100,17 @@ const parseRss = (rss) => {
 
 }
 
-
+// функция обновления состояния приложения
 const updateUi = (data, url) => {
-
-  state.data.feed.push({ id: feedCounter(), title: data.channelTitle, description: data.channelDescription, url: url })
-  data.links.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, postDescription: link.postDescription, feedId: state.data.feed[state.data.feed.length - 1].id }))
-  state.data.error = null
+  const newFeed = { id: feedCounter(), title: data.channelTitle, description: data.channelDescription, url: url }
+  state.data.feed.push(newFeed)
+  data.links.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, postDescription: link.postDescription, feedId:newFeed.id }))
+  state.ui.formError.error = null
 }
-
+// обработчик события отправки формы
+const form = document.querySelector('form')
 form.addEventListener('submit', (e) => {
-
+//предотвращение поведения по умолчанию
   e.preventDefault();
   const formData = new FormData(e.target)
   const url = formData.get('url-input')
@@ -112,6 +119,7 @@ form.addEventListener('submit', (e) => {
     .then((rss) => parseRss(rss))
     .then((data) => updateUi(data, url))
     .then(() => {
+      //проверка таймера функции по поиску новых постов
       if (timerID === null) {
         return checkForNewPosts()
       }
@@ -121,48 +129,54 @@ form.addEventListener('submit', (e) => {
     })
     .catch((err) => {
 
-      state.data.error = keyFromSelector(($) => $.errors[err.message])
+       state.ui.formError.error= keyFromSelector(($) => $.errors[err.message])
     })
-
-
 })
+//рендер модального окна с подробностями о посте
 subscribe(state.ui, () => {
-renderModal(document.querySelector('section'), state)
+  const watchedState = snapshot(state);
+  renderModal(document.querySelector('section'), watchedState)
 })
+//рендер постов
 subscribe(state.data.posts, () => {
   const watchedState = snapshot(state.data);
   renderPosts(postContainer, watchedState)
 })
+//рендер фидов
 subscribe(state.data.feed, () => {
   const watchedState = snapshot(state.data);
   renderFeed(document.getElementById('feed'), watchedState)
 })
+//рендер сообщения об ошибке
 subscribe(state.data, () => {
-  const watchedState = snapshot(state.data);
+  const watchedState = snapshot(state);
   renderMessage(document.getElementById('form-container'), watchedState)
 })
+//функция отслеживания новых постов в фидах
 const checkForNewPosts = () => {
 
   const watchedState = snapshot(state.data)
   const promises = watchedState.feed.map((item) => {
     return loadData(item.url).then((data) => ({ url: item.url, data }))
   })
-
+  //возврат промиса и фильтрация постов
   const promise = Promise.allSettled(promises)
-
   promise.then((filtered) => {
     const fulfilled = filtered.filter((item) => item.status === 'fulfilled').map((item) => ({ url: item.value.url, data: item.value.data }))
     const rejected = filtered.filter((item) => item.status === 'rejected')
+   //вывод сообщения об ошибке
     rejected.forEach((item) => {
-      state.data.error = keyFromSelector(($) => $.errors[item.reason.message])
+      state.ui.formError.error = keyFromSelector(($) => $.errors[item.reason.message])
     })
     return fulfilled
   })
+  // передача успешных постов в парсинг и проброс url
     .then((fulfilled) => {
       return fulfilled.map((rss) => {
         return { url: rss.url, data: parseRss(rss.data) }
       })
     })
+    // проверка текущего фида на наличие новых постов
     .then((parsed) => {
       parsed.forEach((data) => {
         const existingFeed = watchedState.feed.find((item) => item.url === data.url)
@@ -173,9 +187,10 @@ const checkForNewPosts = () => {
 
       })
     })
+    // отображение пойманной ошибки
     .catch((err) => {
 
-      state.data.error = keyFromSelector(($) => $.errors[err.message])
+      state.ui.formError.error = keyFromSelector(($) => $.errors[err.message])
     })
 
   timerID = setTimeout(checkForNewPosts, 5000)
