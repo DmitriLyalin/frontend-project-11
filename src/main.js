@@ -54,12 +54,13 @@ const loadData = (url) => {
 const state = proxy({
   ui: {
     formError: {
-      error:null
+      status: 'initial',
+      error: null
     },
     activePost: null,
   },
   data: {
-   
+
     successMsg: null,
     feed: [],
     posts: [],
@@ -82,7 +83,7 @@ const parseRss = (rss) => {
   if (doc.querySelector('parsererror')) {
     throw new Error('invalidRss')
   }
- 
+
   else {
     // получение данных из RSS
     const channelTitle = doc.querySelector('channel > title').textContent
@@ -105,13 +106,13 @@ const parseRss = (rss) => {
 const updateUi = (data, url) => {
   const newFeed = { id: feedCounter(), title: data.channelTitle, description: data.channelDescription, url: url }
   state.data.feed.push(newFeed)
-  data.links.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, postDescription: link.postDescription, feedId:newFeed.id }))
+  data.links.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, postDescription: link.postDescription, feedId: newFeed.id }))
   state.ui.formError.error = null
 }
 // обработчик события отправки формы
 const form = document.querySelector('form')
 form.addEventListener('submit', (e) => {
-//предотвращение поведения по умолчанию
+  //предотвращение поведения по умолчанию
   e.preventDefault();
   const formData = new FormData(e.target)
   const url = formData.get('url-input')
@@ -120,6 +121,9 @@ form.addEventListener('submit', (e) => {
     .then((rss) => parseRss(rss))
     .then((data) => updateUi(data, url))
     .then(() => {
+      state.ui.formError.status = 'success'
+      state.ui.formError.error = null
+
       //проверка таймера функции по поиску новых постов
       if (timerID === null) {
         return checkForNewPosts()
@@ -129,9 +133,10 @@ form.addEventListener('submit', (e) => {
       }
     })
     .catch((err) => {
-
-       state.ui.formError.error= keyFromSelector(($) => $.errors[err.message])
+      state.ui.formError.status = 'error'
+      state.ui.formError.error = keyFromSelector(($) => $.errors[err.message])
     })
+
 })
 //рендер модального окна с подробностями о посте
 subscribe(state.ui, () => {
@@ -165,13 +170,13 @@ const checkForNewPosts = () => {
   promise.then((filtered) => {
     const fulfilled = filtered.filter((item) => item.status === 'fulfilled').map((item) => ({ url: item.value.url, data: item.value.data }))
     const rejected = filtered.filter((item) => item.status === 'rejected')
-   //вывод сообщения об ошибке
+    //вывод сообщения об ошибке
     rejected.forEach((item) => {
       state.ui.formError.error = keyFromSelector(($) => $.errors[item.reason.message])
     })
     return fulfilled
   })
-  // передача успешных постов в парсинг и проброс url
+    // передача успешных постов в парсинг и проброс url
     .then((fulfilled) => {
       return fulfilled.map((rss) => {
         return { url: rss.url, data: parseRss(rss.data) }

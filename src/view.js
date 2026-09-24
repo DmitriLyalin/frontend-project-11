@@ -71,11 +71,11 @@ const renderMessage = (messageContainer, state) => {
   messageElement.classList.add('text-sm', 'mt-2')
   messageElement.setAttribute('id', 'message')
   // отображение сообщения об ошибке или успешном действии
-  const { error } = state
-  messageElement.textContent = error
+  const { error,status } = state
+  messageElement.textContent = status === 'error'
     ? i18nextInstance.t(error)
     : i18nextInstance.t(($) => $.valid);
-  if (error) {
+  if (status === 'error') {
     messageElement.classList.add('text-red-500')
     inputElement.classList.add('ring-2', 'ring-red-500')
   }
