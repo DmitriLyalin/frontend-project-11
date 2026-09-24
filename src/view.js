@@ -97,7 +97,7 @@ const renderModal = (container, state) => {
   else {container.querySelector('dialog')?.remove()
   const dialogWindow = document.createElement('dialog')
   dialogWindow.classList.add('fixed', 'inset-0', 'm-auto', 'gap-2', 'border', 'py-4', 'border-black-500', 'rounded-lg')
-  dialogWindow.dataset.test = 'modal-body'
+
 
   const dialogContent = document.createElement('div')
   const dialogHeader = document.createElement('div')
@@ -114,6 +114,7 @@ const renderModal = (container, state) => {
   // создание описания поста
   const dialogDescription = document.createElement('p')
   dialogDescription.textContent = i18nextInstance.t(($) => $.modalWindow.goal)
+  dialogDescription.dataset.test = 'modal-body'
   dialogDescription.classList.add('border-y', 'border-gray-700', 'py-4', 'px-4', 'mb-2')
 
   // создание контейнера для кнопок
