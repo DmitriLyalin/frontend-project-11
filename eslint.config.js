@@ -3,5 +3,5 @@ import globals from "globals";
 import { defineConfig, globalIgnores  } from "eslint/config";
 
 export default defineConfig([
-   globalIgnores([".github/*", "node_modules/*", "playwright-report/**", "playwright.config.js", "**/dist/**"]), { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
+   globalIgnores([".github/*", "node_modules/*", "**/dist/**"]), { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
 ]);
