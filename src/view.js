@@ -93,7 +93,8 @@ const renderMessage = (messageContainer, state) => {
 // функция рендера модального окна
 const renderModal = (container, state) => {
   // удаление предыдущего модального окна
-  container.querySelector('dialog')?.remove()
+  if (!state.ui.activePost) return
+  else {container.querySelector('dialog')?.remove()
   const dialogWindow = document.createElement('dialog')
   dialogWindow.classList.add('fixed', 'inset-0', 'm-auto', 'gap-2', 'border', 'py-4', 'border-black-500', 'rounded-lg')
   dialogWindow.dataset.test = 'modal-body'
@@ -134,6 +135,7 @@ const renderModal = (container, state) => {
   dialogWindow.append(dialogContent)
   container.append(dialogWindow)
   dialogWindow.showModal()
+  }
 }
 
 export { renderMessage, renderPosts, renderFeed, renderModal }

@@ -59,7 +59,7 @@ const state = proxy({
     activePost: null,
   },
   data: {
-    // error: null,
+   
     successMsg: null,
     feed: [],
     posts: [],
@@ -82,6 +82,7 @@ const parseRss = (rss) => {
   if (doc.querySelector('parsererror')) {
     throw new Error('invalidRss')
   }
+ 
   else {
     // получение данных из RSS
     const channelTitle = doc.querySelector('channel > title').textContent
@@ -148,8 +149,8 @@ subscribe(state.data.feed, () => {
   renderFeed(document.getElementById('feed'), watchedState)
 })
 //рендер сообщения об ошибке
-subscribe(state.data, () => {
-  const watchedState = snapshot(state);
+subscribe(state.ui.formError, () => {
+  const watchedState = snapshot(state.ui.formError);
   renderMessage(document.getElementById('form-container'), watchedState)
 })
 //функция отслеживания новых постов в фидах
