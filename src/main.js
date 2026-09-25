@@ -71,7 +71,8 @@ form.addEventListener('submit', (e) => {
     })
     .catch((err) => {
       state.ui.formError.status = 'error'
-      state.ui.formError.error = keyFromSelector(($) => $.errors[err.message])
+      const errorMessage = keyFromSelector(($) => $.errors[err.message])
+ state.ui.formError.error = new Error(errorMessage)  
     })
 
 })
