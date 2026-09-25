@@ -1,5 +1,6 @@
 import './style.css'
 import * as yup from 'yup';
+import parseRss from './parse';
 import { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
 import { renderPosts, renderFeed, renderMessage, renderModal } from './view.js'
@@ -74,32 +75,6 @@ const validateUrl = (url) => {
     .catch((err) => {
       return Promise.reject(err)
     })
-}
-
-// функция парсинга RSS
-const parseRss = (rss) => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(rss, "application/xml");
-  if (doc.querySelector('parsererror')) {
-    throw new Error('invalidRss')
-  }
-
-  else {
-    // получение данных из RSS
-    const channelTitle = doc.querySelector('channel > title').textContent
-    const channelDescription = doc.querySelector('channel > description').textContent
-    const posts = doc.querySelectorAll('item')
-    const links = [...posts].map((post) => {
-      // получение данных из каждого поста
-      const postTitle = post.querySelector('title').textContent
-      const postLink = post.querySelector('link').textContent
-      const postDescription = post.querySelector('description').textContent
-      return { postTitle, postLink, postDescription }
-    })
-
-    return { channelTitle, channelDescription, links }
-  }
-
 }
 
 // функция обновления состояния приложения
@@ -189,8 +164,7 @@ const checkForNewPosts = () => {
         const newPosts = watchedState.posts.filter((item) => item.feedId === existingFeed.id)
         const newPostsTitles = new Set(newPosts.map(item => item.title));
         const result = data.data.links.filter(link => !newPostsTitles.has(link.postTitle))
-        result.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, feedId: state.data.feed[state.data.feed.length - 1].id }))
-
+        result.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink,  postDescription: link.postDescription, feedId: existingFeed.id }))
       })
     })
     // отображение пойманной ошибки
