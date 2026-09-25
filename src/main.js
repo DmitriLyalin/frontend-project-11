@@ -1,55 +1,36 @@
 import './style.css'
-import * as yup from 'yup';
+
 import parseRss from './parse';
+import loadData from './loadData';
+import validateUrl from './validate';
+import createIdGenerator from './idGenerator.js'
+import updateUi from './updateUi'
 import { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
 import { renderPosts, renderFeed, renderMessage, renderModal } from './view.js'
-import axios from 'axios'
-// схема валидации URL
-const schema = yup.string()
-  .trim()
-  .required('emptyUrl')
-  .url('invalidUrl')
-  .test('noDuplicate', 'duplicateRss', (value) => {
-    const watchedState = snapshot(state.data)
-    const { feed } = watchedState
-    return !feed.some((item) => item.url === value)
-  })
+
+
 // создание timerID
 let timerID = null
-// генерация уникального ID
-const createIdGenerator = (start = 1) => {
-  let count = start;
-  return () => count++;
-};
+
+
 // обработчик клика на Посты для выявления активного поста
 const postContainer = document.getElementById('posts')
 postContainer.addEventListener('click', (e) => {
-  state.ui.activePost = null
-  const pickedElement = e.target.closest('li')
-  const link = pickedElement.querySelector('a').href
-  const currentPost = state.data.posts.find((post) => post.postUrl === link)
-  currentPost.isSeen = true
-  state.ui.activePost = currentPost
+  if (e.target.tagName == 'BUTTON') {
+    state.ui.activePost = null
+    const pickedElement = e.target.closest('li')
+    const link = pickedElement.querySelector('a').href
+    const currentPost = state.data.posts.find((post) => post.postUrl === link)
+    currentPost.isSeen = true
+    state.ui.activePost = currentPost
+  }
 
 })
-//создание каунтера для постов и фидов
-const feedCounter = createIdGenerator()
+
+//создание каунтера для постов 
+
 const postCounter = createIdGenerator()
-
-//Загрузка данных с сервера
-
-const loadData = (url) => {
-  return axios.get('https://allorigins.hexlet.app/get', {
-    params: { disableCache: true, url }
-  }).then((response) => {
-    return response.data.contents
-  })
-    .catch((err) => {
-      err.message = 'networkError'
-      return Promise.reject(err)
-    })
-}
 
 //создание состояния приложения
 const state = proxy({
@@ -67,23 +48,9 @@ const state = proxy({
     posts: [],
   }
 })
-// функция валидации URL
-const validateUrl = (url) => {
-  return schema
-    .validate(url)
-    .then(() => url)
-    .catch((err) => {
-      return Promise.reject(err)
-    })
-}
 
-// функция обновления состояния приложения
-const updateUi = (data, url) => {
-  const newFeed = { id: feedCounter(), title: data.channelTitle, description: data.channelDescription, url: url }
-  state.data.feed.push(newFeed)
-  data.links.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, postDescription: link.postDescription, feedId: newFeed.id }))
-  state.ui.formError.error = null
-}
+
+
 // обработчик события отправки формы
 const form = document.querySelector('form')
 form.addEventListener('submit', (e) => {
@@ -164,7 +131,7 @@ const checkForNewPosts = () => {
         const newPosts = watchedState.posts.filter((item) => item.feedId === existingFeed.id)
         const newPostsTitles = new Set(newPosts.map(item => item.title));
         const result = data.data.links.filter(link => !newPostsTitles.has(link.postTitle))
-        result.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink,  postDescription: link.postDescription, feedId: existingFeed.id }))
+        result.forEach((link) => state.data.posts.push({ id: postCounter(), isSeen: false, title: link.postTitle, postUrl: link.postLink, postDescription: link.postDescription, feedId: existingFeed.id }))
       })
     })
     // отображение пойманной ошибки
