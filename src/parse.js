@@ -1,4 +1,5 @@
 // функция парсинга RSS
+
 const parseRss = (rss) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(rss, "application/xml");
