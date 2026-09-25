@@ -65,7 +65,7 @@ const renderFeed = (feedContainer, state) => {
 // функция рендера сообщений об ошибках и успешных действиях
 const renderMessage = (messageContainer, state) => {
   // удаление предыдущего сообщения и окрашивание инпута в красный цвет при ошибке
-  const inputElement = document.querySelector('input')
+  const inputElement = messageContainer.querySelector('input')
   inputElement.classList.remove('ring-2', 'ring-red-500')
   const messageElement = document.createElement('div')
   messageElement.classList.add('text-sm', 'mt-2')
