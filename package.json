@@ -11,16 +11,13 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/forms": "^0.5.11",
-    "@types/node": "^26.6.2",
     "eslint": "^10.9.1",
     "globals": "^17.12.0",
     "vite": "^8.2.2"
   },
   "dependencies": {
-    "@es-toolkit/es-toolkit": "npm:@jsr/es-toolkit__es-toolkit@^1.52.0-dev.2101+3d858779",
     "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.20.0",
-    "es-toolkit": "^1.52.0",
     "i18next": "^26.4.2",
     "tailwindcss": "^4.3.3",
     "valtio": "^2.3.2",
