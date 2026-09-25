@@ -7,30 +7,28 @@ import createIdGenerator from './idGenerator.js'
 import updateUi from './updateUi'
 import { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
+import { subscribeKey } from 'valtio/vanilla/utils'
 import { renderPosts, renderFeed, renderMessage, renderModal } from './view.js'
 
 
 // создание timerID
 let timerID = null
-
+//создание каунтера для постов 
+const postCounter = createIdGenerator()
 
 // обработчик клика на Посты для выявления активного поста
 const postContainer = document.getElementById('posts')
 postContainer.addEventListener('click', (e) => {
   if (e.target.tagName == 'BUTTON') {
-    state.ui.activePost = null
+    console.log( state.ui.activePost)
     const pickedElement = e.target.closest('li')
     const link = pickedElement.querySelector('a').href
     const currentPost = state.data.posts.find((post) => post.postUrl === link)
     currentPost.isSeen = true
     state.ui.activePost = currentPost
+    console.log( state.ui.activePost)
   }
-
 })
-
-//создание каунтера для постов 
-
-const postCounter = createIdGenerator()
 
 //создание состояния приложения
 const state = proxy({
@@ -42,14 +40,11 @@ const state = proxy({
     activePost: null,
   },
   data: {
-
     successMsg: null,
     feed: [],
     posts: [],
   }
 })
-
-
 
 // обработчик события отправки формы
 const form = document.querySelector('form')
@@ -81,10 +76,19 @@ form.addEventListener('submit', (e) => {
 
 })
 //рендер модального окна с подробностями о посте
-subscribe(state.ui, () => {
-  const watchedState = snapshot(state);
-  renderModal(document.querySelector('section'), watchedState)
+subscribeKey(state.ui, 'activePost', (value) => {
+  renderModal(document.querySelector('section'), value)
+  const dialogWindow= document.querySelector('dialog')
+  dialogWindow.addEventListener('click', (event) => {
+  const btn = event.target.closest('[data-role="close-btn"]');
+  if (!btn) return; 
+    dialogWindow.close()
+    state.ui.activePost = null
+});
+  
+
 })
+
 //рендер постов
 subscribe(state.data.posts, () => {
   const watchedState = snapshot(state.data);
