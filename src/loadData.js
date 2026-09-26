@@ -6,7 +6,7 @@ const loadData = (url) => {
   }).then((response) => {
     return response.data.contents
   })
-    .catch((err) => {
+    .catch(() => {
       return Promise.reject(new Error('networkError'))
     })
 }
