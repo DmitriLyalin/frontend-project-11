@@ -1,6 +1,5 @@
 //отключение кнопки отправки формы
 const disableSubmit = (form, formStatus) => {
-  console.log(formStatus)
   const submitBtn = form.querySelector('input[type="submit"]')
   switch (formStatus.status) {
     case 'sending' :
