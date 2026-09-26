@@ -5,10 +5,12 @@ import loadData from './loadData';
 import validateUrl from './validate';
 import createIdGenerator from './idGenerator.js'
 import updateUi from './updateUi'
+
+
 import { keyFromSelector } from "i18next";
 import { proxy, subscribe, snapshot } from 'valtio/vanilla'
 import { subscribeKey } from 'valtio/vanilla/utils'
-import { renderPosts, renderFeed, renderMessage, renderModal } from './view.js'
+import { renderPosts, renderFeed, renderMessage, renderModal, disableSubmit } from './view.js'
 
 
 // создание timerID
@@ -20,13 +22,13 @@ const postCounter = createIdGenerator()
 const postContainer = document.getElementById('posts')
 postContainer.addEventListener('click', (e) => {
   if (e.target.tagName == 'BUTTON') {
-    console.log( state.ui.activePost)
+
     const pickedElement = e.target.closest('li')
     const link = pickedElement.querySelector('a').href
     const currentPost = state.data.posts.find((post) => post.postUrl === link)
     currentPost.isSeen = true
     state.ui.activePost = currentPost
-    console.log( state.ui.activePost)
+
   }
 })
 
@@ -49,8 +51,10 @@ const state = proxy({
 // обработчик события отправки формы
 const form = document.querySelector('form')
 form.addEventListener('submit', (e) => {
+ state.ui.formError.status ='sending'
   //предотвращение поведения по умолчанию
   e.preventDefault();
+  
   const formData = new FormData(e.target)
   const url = formData.get('url-input')
   validateUrl(url)
@@ -60,7 +64,6 @@ form.addEventListener('submit', (e) => {
     .then(() => {
       state.ui.formError.status = 'success'
       state.ui.formError.error = null
-
       //проверка таймера функции по поиску новых постов
       if (timerID === null) {
         return checkForNewPosts()
@@ -103,6 +106,7 @@ subscribe(state.data.feed, () => {
 subscribe(state.ui.formError, () => {
   const watchedState = snapshot(state.ui.formError);
   renderMessage(document.getElementById('form-container'), watchedState)
+  disableSubmit(form,watchedState)
 })
 //функция отслеживания новых постов в фидах
 const checkForNewPosts = () => {
