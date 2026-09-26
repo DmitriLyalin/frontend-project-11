@@ -73,7 +73,7 @@ const renderMessage = (messageContainer, state) => {
   // отображение сообщения об ошибке или успешном действии
   const { error,status } = state
   messageElement.textContent = status === 'error'
-    ? i18nextInstance.t(error.message)
+    ? i18nextInstance.t(error)
     : i18nextInstance.t(($) => $.valid);
   if (status === 'error') {
     messageElement.classList.add('text-red-500')
