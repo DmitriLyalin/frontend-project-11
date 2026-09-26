@@ -26,9 +26,6 @@ const i18nextInstance = i18n.createInstance();
     },
     valid: 'RSS успешно загружен',
     sending: ' Отправка данных',
-    modalWindow: {
-      goal: 'Цель: Научиться извлекать из дерева необходимые данные'
-    }
   },
     }
   }
