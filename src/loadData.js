@@ -7,8 +7,7 @@ const loadData = (url) => {
     return response.data.contents
   })
     .catch((err) => {
-      err.message = 'networkError'
-      return Promise.reject(err)
+      return Promise.reject(new Error('networkError'))
     })
 }
 export default loadData
