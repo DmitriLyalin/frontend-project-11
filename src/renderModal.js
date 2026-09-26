@@ -27,7 +27,7 @@ const renderModal = (container, activePost) => {
   dialogHeader.append(dialogTitle, xButton)
   // создание описания поста
   const dialogDescription = document.createElement('p')
-  dialogDescription.textContent = i18nextInstance.t(($) => $.modalWindow.goal)
+  dialogDescription.textContent = activePost.postDescription
   dialogDescription.dataset.test = 'modal-body'
   dialogDescription.classList.add('border-y', 'border-gray-700', 'py-4', 'px-4', 'mb-2')
 
